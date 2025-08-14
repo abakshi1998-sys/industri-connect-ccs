@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Industri-Connect | Communication Consolidation System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="crm-layout">
+        <!-- Header -->
+        <header class="crm-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="brand-section">
+                        <h1 class="system-title">Industri-Connect</h1>
+                        <p class="system-subtitle">Communication Consolidation System</p>
+                    </div>
+                    <div class="system-status">
+                        <span class="status status--success">Live</span>
+                        <span class="last-sync">Last sync: 2 min ago</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="stats-summary">
+                        <div class="stat-item">
+                            <span class="stat-label">Today</span>
+                            <span class="stat-value" id="todayInteractions">156</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Customers</span>
+                            <span class="stat-value" id="totalCustomers">247</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="crm-main">
+            <!-- Sidebar -->
+            <aside class="crm-sidebar">
+                <nav class="sidebar-nav">
+                    <button class="nav-item active" data-view="dashboard">
+                        <span class="nav-icon">📊</span>
+                        Dashboard
+                    </button>
+                    <button class="nav-item" data-view="customers">
+                        <span class="nav-icon">👥</span>
+                        Customers
+                    </button>
+                    <button class="nav-item" data-view="communications">
+                        <span class="nav-icon">💬</span>
+                        Communications
+                    </button>
+                    <button class="nav-item" data-view="campaigns">
+                        <span class="nav-icon">📢</span>
+                        Campaigns
+                    </button>
+                </nav>
+
+                <!-- Channel Performance -->
+                <div class="channel-performance">
+                    <h3>Channel Performance</h3>
+                    <div class="channel-stats">
+                        <div class="channel-stat whatsapp">
+                            <div class="channel-info">
+                                <span class="channel-name">WhatsApp</span>
+                                <span class="channel-count">2,567</span>
+                            </div>
+                            <div class="channel-rate">98.2% delivery</div>
+                        </div>
+                        <div class="channel-stat calls">
+                            <div class="channel-info">
+                                <span class="channel-name">Business Calls</span>
+                                <span class="channel-count">1,204</span>
+                            </div>
+                            <div class="channel-rate">76.5% connect</div>
+                        </div>
+                        <div class="channel-stat dialer">
+                            <div class="channel-info">
+                                <span class="channel-name">Dialer</span>
+                                <span class="channel-count">198</span>
+                            </div>
+                            <div class="channel-rate">34.2% connect</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Content Area -->
+            <main class="crm-content">
+                <!-- Dashboard View -->
+                <div id="dashboardView" class="view-content active">
+                    <div class="view-header">
+                        <h2>Dashboard Overview</h2>
+                        <div class="view-actions">
+                            <button class="btn btn--secondary btn--sm" id="refreshData">
+                                🔄 Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <h3>Recent Interactions</h3>
+                            <div id="recentInteractions" class="recent-interactions"></div>
+                        </div>
+                        
+                        <div class="dashboard-card">
+                            <h3>Active Customers</h3>
+                            <div id="activeCustomers" class="active-customers"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customers View -->
+                <div id="customersView" class="view-content">
+                    <div class="view-header">
+                        <h2>Customer Management</h2>
+                        <div class="search-filters">
+                            <input type="text" id="customerSearch" class="form-control" placeholder="Search customers by name, company, or phone...">
+                            <select id="industryFilter" class="form-control">
+                                <option value="">All Industries</option>
+                                <option value="Manufacturing">Manufacturing</option>
+                                <option value="IT Services">IT Services</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Heavy Industry">Heavy Industry</option>
+                                <option value="Green Technology">Green Technology</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="customers-grid" id="customersGrid"></div>
+                </div>
+
+                <!-- Communications View -->
+                <div id="communicationsView" class="view-content">
+                    <div class="view-header">
+                        <h2>Communication Timeline</h2>
+                        <div class="comm-filters">
+                            <select id="channelFilter" class="form-control">
+                                <option value="">All Channels</option>
+                                <option value="WhatsApp">WhatsApp</option>
+                                <option value="Business Call">Business Calls</option>
+                                <option value="Mobile Call">Mobile Calls</option>
+                                <option value="Dialer">Dialer</option>
+                            </select>
+                            <select id="directionFilter" class="form-control">
+                                <option value="">All Directions</option>
+                                <option value="inbound">Inbound</option>
+                                <option value="outbound">Outbound</option>
+                            </select>
+                            <input type="date" id="dateFilter" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="communication-timeline" id="communicationTimeline"></div>
+                </div>
+
+                <!-- Campaigns View -->
+                <div id="campaignsView" class="view-content">
+                    <div class="view-header">
+                        <h2>Dialer Campaigns</h2>
+                    </div>
+
+                    <div class="campaigns-grid" id="campaignsGrid"></div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Customer Detail Modal -->
+        <div id="customerModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalCustomerName"></h3>
+                    <button class="modal-close" id="closeModal">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="customer-info" id="customerInfo"></div>
+                    <div class="customer-timeline">
+                        <h4>Communication History</h4>
+                        <div id="customerTimeline" class="timeline"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
