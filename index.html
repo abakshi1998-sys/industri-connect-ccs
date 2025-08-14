@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Industri-Connect | Communication Consolidation System</title>
+    <title>IndustriConnect CRM | Lead Management</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,10 +12,7 @@
         <header class="crm-header">
             <div class="header-content">
                 <div class="header-left">
-                    <div class="brand-section">
-                        <h1 class="system-title">Industri-Connect</h1>
-                        <p class="system-subtitle">Communication Consolidation System</p>
-                    </div>
+                    <h1 class="system-title">IndustriConnect</h1>
                     <div class="system-status">
                         <span class="status status--success">Live</span>
                         <span class="last-sync">Last sync: 2 min ago</span>
@@ -169,19 +166,168 @@
             </main>
         </div>
 
-        <!-- Customer Detail Modal -->
-        <div id="customerModal" class="modal hidden">
+        <!-- Lead View Modal -->
+        <div id="leadViewModal" class="modal lead-modal hidden">
+            <div class="modal-content lead-modal-content">
+                <!-- Lead Header -->
+                <div class="lead-header">
+                    <div class="lead-summary">
+                        <div class="lead-info">
+                            <h2 id="leadCompanyName" class="lead-company"></h2>
+                            <div class="lead-contact">
+                                <span id="leadContactName" class="contact-name"></span>
+                                <span class="contact-separator">•</span>
+                                <span id="leadPhoneMasked" class="phone-masked"></span>
+                            </div>
+                            <div class="lead-industry" id="leadIndustry"></div>
+                        </div>
+                        <button class="modal-close" id="closeLead">×</button>
+                    </div>
+                    
+                    <!-- Stats Bar -->
+                    <div class="lead-stats-bar">
+                        <div class="stat-group">
+                            <div class="stat-item">
+                                <span class="stat-value" id="totalInteractionsCount">0</span>
+                                <span class="stat-label">Total Interactions</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="lastInteractionTime">-</span>
+                                <span class="stat-label">Last Interaction</span>
+                            </div>
+                        </div>
+                        <div class="channel-mix-bar" id="channelMixBar"></div>
+                    </div>
+                </div>
+
+                <!-- Lead Body -->
+                <div class="lead-body">
+                    <!-- Timeline Section (70%) -->
+                    <div class="lead-timeline-section">
+                        <h3>Communication Timeline</h3>
+                        <div class="timeline-scroll" id="leadTimeline"></div>
+                        <button class="btn btn--secondary btn--sm load-more" id="loadMoreTimeline" style="display: none;">
+                            Load More Messages
+                        </button>
+                    </div>
+
+                    <!-- Right Panel (30%) -->
+                    <div class="lead-right-panel">
+                        <!-- Call Summary Section -->
+                        <div class="call-summary-section">
+                            <div class="section-header">
+                                <h3>Call Summary</h3>
+                                <select id="callTimeFilter" class="form-control call-filter">
+                                    <option value="all">All Time</option>
+                                    <option value="today">Today</option>
+                                    <option value="7days">Last 7 Days</option>
+                                    <option value="30days">Last 30 Days</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Call Metrics -->
+                            <div class="call-metrics">
+                                <div class="metric-item">
+                                    <span class="metric-value" id="totalCalls">0</span>
+                                    <span class="metric-label">Total Calls</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="metric-value" id="avgDuration">0:00</span>
+                                    <span class="metric-label">Avg Duration</span>
+                                </div>
+                                <div class="metric-item">
+                                    <span class="metric-value" id="connectRate">0%</span>
+                                    <span class="metric-label">Connect Rate</span>
+                                </div>
+                            </div>
+
+                            <!-- Call Table -->
+                            <div class="call-table-container">
+                                <table class="call-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                            <th>Duration</th>
+                                            <th>Outcome</th>
+                                            <th>Recording</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="callTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="quick-actions-section">
+                            <h3>Quick Actions</h3>
+                            <div class="action-buttons">
+                                <button class="btn btn--primary btn--full-width" id="scheduleCallback">
+                                    📅 Schedule Callback
+                                </button>
+                                <button class="btn btn--secondary btn--full-width" id="sendWhatsApp">
+                                    💬 Send WhatsApp
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule Callback Modal -->
+        <div id="callbackModal" class="modal small-modal hidden">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 id="modalCustomerName"></h3>
-                    <button class="modal-close" id="closeModal">×</button>
+                    <h3>Schedule Callback</h3>
+                    <button class="modal-close" id="closeCallback">×</button>
                 </div>
                 <div class="modal-body">
-                    <div class="customer-info" id="customerInfo"></div>
-                    <div class="customer-timeline">
-                        <h4>Communication History</h4>
-                        <div id="customerTimeline" class="timeline"></div>
-                    </div>
+                    <form id="callbackForm">
+                        <div class="form-group">
+                            <label class="form-label">Callback Date & Time</label>
+                            <input type="datetime-local" id="callbackDateTime" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Notes</label>
+                            <textarea id="callbackNotes" class="form-control" rows="3" placeholder="Add notes for the callback..."></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn--secondary" id="cancelCallback">Cancel</button>
+                            <button type="submit" class="btn btn--primary">Schedule</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- WhatsApp Template Modal -->
+        <div id="whatsappModal" class="modal small-modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Send WhatsApp Message</h3>
+                    <button class="modal-close" id="closeWhatsApp">×</button>
+                </div>
+                <div class="modal-body">
+                    <form id="whatsappForm">
+                        <div class="form-group">
+                            <label class="form-label">Message Template</label>
+                            <select id="messageTemplate" class="form-control" required>
+                                <option value="">Select template...</option>
+                                <option value="followup">Follow-up Message</option>
+                                <option value="quote">Request Quote</option>
+                                <option value="catalog">Send Catalog</option>
+                                <option value="custom">Custom Message</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Message</label>
+                            <textarea id="messageContent" class="form-control" rows="4" placeholder="Type your message..."></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn--secondary" id="cancelWhatsApp">Cancel</button>
+                            <button type="submit" class="btn btn--primary">Send Message</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

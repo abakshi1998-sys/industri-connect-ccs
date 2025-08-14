@@ -70,34 +70,6 @@ const appData = {
       lastInteraction: "2025-08-13T12:30:00Z",
       totalInteractions: 12,
       createdAt: "2025-03-05T09:30:00Z"
-    },
-    {
-      customerKey: "+919876543215",
-      companyName: "Metro Construction Ltd.",
-      contactName: "Vijay Gupta",
-      phoneNumber: "+919876543215",
-      crmContactId: "CRM_MC_006",
-      email: "vijay@metroconstruction.in",
-      industry: "Construction",
-      location: "Delhi, NCR",
-      status: "active",
-      lastInteraction: "2025-08-12T14:20:00Z",
-      totalInteractions: 8,
-      createdAt: "2025-04-12T08:00:00Z"
-    },
-    {
-      customerKey: "+919876543216",
-      companyName: "Apex Pharmaceuticals",
-      contactName: "Dr. Sneha Joshi",
-      phoneNumber: "+919876543216",
-      crmContactId: "CRM_AP_007",
-      email: "sneha.joshi@apexpharma.com",
-      industry: "Pharmaceuticals",
-      location: "Hyderabad, Telangana",
-      status: "active",
-      lastInteraction: "2025-08-11T11:45:00Z",
-      totalInteractions: 19,
-      createdAt: "2025-02-28T15:30:00Z"
     }
   ],
   interactions: [
@@ -258,6 +230,121 @@ const appData = {
         attempts: 2,
         disposition: "voicemail_left"
       }
+    },
+    {
+      id: "int_011",
+      customerKey: "+919876543210",
+      channel: "WhatsApp",
+      direction: "inbound",
+      content: "Order delivery confirmed. Team is very happy with quality. Will place monthly orders now.",
+      timestamp: "2025-08-13T14:20:00Z",
+      status: "read",
+      metadata: {
+        messageType: "text",
+        deliveryStatus: "delivered",
+        readStatus: "read"
+      }
+    },
+    {
+      id: "int_012",
+      customerKey: "+919876543210",
+      channel: "Mobile Call",
+      direction: "outbound",
+      content: "Follow-up call to confirm delivery and discuss monthly contract",
+      timestamp: "2025-08-12T16:30:00Z",
+      status: "completed",
+      metadata: {
+        duration: 360,
+        disposition: "satisfied",
+        outcome: "Monthly contract agreed",
+        callType: "follow_up"
+      }
+    }
+  ],
+  call_logs: [
+    {
+      call_id: "call_001",
+      interaction_id: "int_003",
+      call_start_time: "2025-08-14T11:15:00Z",
+      call_end_time: "2025-08-14T11:23:00Z",
+      duration: 480,
+      call_outcome: "resolved",
+      call_disposition: "order_confirmed",
+      recording_url: "https://recordings.example.com/call_001.mp3",
+      caller_number: "+919876543210",
+      call_quality: "good"
+    },
+    {
+      call_id: "call_002",
+      interaction_id: "int_009",
+      call_start_time: "2025-08-13T12:30:00Z",
+      call_end_time: "2025-08-13T12:42:00Z",
+      duration: 720,
+      call_outcome: "quote_requested",
+      call_disposition: "quote_followup",
+      recording_url: "https://recordings.example.com/call_002.mp3",
+      caller_number: "+919876543214",
+      call_quality: "good"
+    },
+    {
+      call_id: "call_003",
+      interaction_id: "int_006",
+      call_start_time: "2025-08-14T08:20:00Z",
+      call_end_time: "2025-08-14T08:23:00Z",
+      duration: 180,
+      call_outcome: "callback_requested",
+      call_disposition: "callback_scheduled",
+      recording_url: null,
+      caller_number: "+919876543212",
+      call_quality: "fair"
+    },
+    {
+      call_id: "call_004",
+      interaction_id: "int_012",
+      call_start_time: "2025-08-12T16:30:00Z",
+      call_end_time: "2025-08-12T16:36:00Z",
+      duration: 360,
+      call_outcome: "satisfied",
+      call_disposition: "contract_agreed",
+      recording_url: "https://recordings.example.com/call_004.mp3",
+      caller_number: "+919876543210",
+      call_quality: "excellent"
+    },
+    {
+      call_id: "call_005",
+      interaction_id: "int_004",
+      call_start_time: "2025-08-14T09:45:00Z",
+      call_end_time: "2025-08-14T09:49:00Z",
+      duration: 240,
+      call_outcome: "connected",
+      call_disposition: "interested",
+      recording_url: "https://recordings.example.com/call_005.mp3",
+      caller_number: "+919876543211",
+      call_quality: "good"
+    }
+  ],
+  whatsapp_messages: [
+    {
+      message_id: "wa_001",
+      interaction_id: "int_001",
+      phone_number: "+919876543210",
+      message_type: "text",
+      content: "Hi, we need urgent quotation for 2000 reams A4 paper and 50 HP LaserJet cartridges. Can you send pricing with GST breakdown?",
+      timestamp: "2025-08-14T10:30:00Z",
+      direction: "inbound",
+      delivery_status: "delivered",
+      read_status: "read"
+    },
+    {
+      message_id: "wa_002",
+      interaction_id: "int_002",
+      phone_number: "+919876543210",
+      message_type: "text",
+      content: "Hello Mr. Kumar! Thank you for your inquiry. I'll prepare the quotation for 2000 reams A4 paper and 50 HP cartridges with complete GST breakdown and delivery timeline. You'll receive it within 30 minutes.",
+      timestamp: "2025-08-14T10:33:00Z",
+      direction: "outbound",
+      delivery_status: "delivered",
+      read_status: "pending"
     }
   ],
   systemStats: {
@@ -307,6 +394,8 @@ const appData = {
 let currentView = 'dashboard';
 let filteredCustomers = [...appData.customers];
 let filteredInteractions = [...appData.interactions];
+let currentLeadKey = null;
+let timelineDisplayCount = 10;
 
 // Utility Functions
 function formatDateTime(dateString) {
@@ -340,6 +429,22 @@ function formatDate(dateString) {
   });
 }
 
+function formatDuration(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${minutes}:${secs.toString().padStart(2, '0')}`;
+}
+
+function maskPhoneNumber(phoneNumber) {
+  if (phoneNumber && phoneNumber.length >= 10) {
+    const country = phoneNumber.substring(0, 3);
+    const firstPart = phoneNumber.substring(3, 6);
+    const masked = '****';
+    return `${country}${firstPart}${masked}`;
+  }
+  return phoneNumber;
+}
+
 function getChannelClass(channel) {
   switch (channel) {
     case 'WhatsApp':
@@ -368,29 +473,6 @@ function getChannelIcon(channel) {
   }
 }
 
-// Phone Number Masking Utility Function
-function maskPhoneNumber(phoneNumber) {
-  if (!phoneNumber || phoneNumber.length < 10) {
-    return phoneNumber;
-  }
-  
-  // Handle Indian phone numbers with +91 country code
-  if (phoneNumber.startsWith('+91') && phoneNumber.length === 13) {
-    // Format: +91987654**** (show +91 + first 4 digits + ****)
-    const countryCode = phoneNumber.substring(0, 3); // +91
-    const firstFourDigits = phoneNumber.substring(3, 7); // first 4 digits after country code
-    return `${countryCode}${firstFourDigits}****`;
-  }
-  
-  // For other formats, mask last 4 digits
-  if (phoneNumber.length >= 8) {
-    const visiblePart = phoneNumber.substring(0, phoneNumber.length - 4);
-    return `${visiblePart}****`;
-  }
-  
-  return phoneNumber;
-}
-
 function findCustomerByKey(customerKey) {
   return appData.customers.find(c => c.customerKey === customerKey);
 }
@@ -400,8 +482,7 @@ function initNavigation() {
   const navItems = document.querySelectorAll('.nav-item');
   
   navItems.forEach(item => {
-    item.addEventListener('click', (e) => {
-      e.preventDefault();
+    item.addEventListener('click', () => {
       const view = item.dataset.view;
       switchView(view);
       
@@ -413,17 +494,15 @@ function initNavigation() {
 }
 
 function switchView(view) {
-  console.log('Switching to view:', view);
-  
   // Hide all views
   document.querySelectorAll('.view-content').forEach(content => {
     content.classList.remove('active');
   });
   
   // Show selected view
-  const targetView = document.getElementById(`${view}View`);
-  if (targetView) {
-    targetView.classList.add('active');
+  const viewElement = document.getElementById(`${view}View`);
+  if (viewElement) {
+    viewElement.classList.add('active');
     currentView = view;
     
     // Load view-specific content
@@ -441,8 +520,6 @@ function switchView(view) {
         loadCampaigns();
         break;
     }
-  } else {
-    console.error('View not found:', `${view}View`);
   }
 }
 
@@ -455,6 +532,8 @@ function loadDashboard() {
 
 function loadRecentInteractions() {
   const container = document.getElementById('recentInteractions');
+  if (!container) return;
+  
   const recentInteractions = appData.interactions
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
     .slice(0, 8);
@@ -465,7 +544,7 @@ function loadRecentInteractions() {
     const channelIcon = getChannelIcon(interaction.channel);
     
     return `
-      <div class="interaction-item ${channelClass}">
+      <div class="interaction-item ${channelClass}" data-customer-key="${interaction.customerKey}" style="cursor: pointer;">
         <div class="interaction-channel ${channelClass}">
           ${channelIcon} ${interaction.channel}
         </div>
@@ -477,19 +556,31 @@ function loadRecentInteractions() {
       </div>
     `;
   }).join('');
+  
+  // Add click event listeners to interaction items
+  container.querySelectorAll('.interaction-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const customerKey = item.dataset.customerKey;
+      if (customerKey) {
+        openLeadView(customerKey);
+      }
+    });
+  });
 }
 
 function loadActiveCustomers() {
   const container = document.getElementById('activeCustomers');
+  if (!container) return;
+  
   const activeCustomers = appData.customers
     .sort((a, b) => new Date(b.lastInteraction) - new Date(a.lastInteraction))
     .slice(0, 6);
 
   container.innerHTML = activeCustomers.map(customer => `
-    <div class="customer-item" data-customer-key="${customer.customerKey}" style="cursor: pointer;">
+    <div class="customer-item" data-customer-key="${customer.customerKey}" style="cursor: pointer; tabindex: 0;">
       <div class="customer-info">
         <div class="customer-company">${customer.companyName}</div>
-        <div class="customer-contact">${customer.contactName} • ${maskPhoneNumber(customer.phoneNumber)}</div>
+        <div class="customer-contact">${customer.contactName} • ${customer.phoneNumber}</div>
       </div>
       <div class="customer-stats">
         <span>${customer.totalInteractions} interactions</span>
@@ -498,20 +589,35 @@ function loadActiveCustomers() {
       </div>
     </div>
   `).join('');
-
-  // Add click listeners for customer items
+  
+  // Add click event listeners to customer items
   container.querySelectorAll('.customer-item').forEach(item => {
-    item.addEventListener('click', (e) => {
-      e.preventDefault();
+    item.addEventListener('click', () => {
       const customerKey = item.dataset.customerKey;
-      openCustomerModal(customerKey);
+      if (customerKey) {
+        openLeadView(customerKey);
+      }
+    });
+    
+    // Add keyboard support
+    item.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const customerKey = item.dataset.customerKey;
+        if (customerKey) {
+          openLeadView(customerKey);
+        }
+      }
     });
   });
 }
 
 function updateStats() {
-  document.getElementById('todayInteractions').textContent = appData.systemStats.todayInteractions;
-  document.getElementById('totalCustomers').textContent = appData.systemStats.totalCustomers;
+  const todayElement = document.getElementById('todayInteractions');
+  const totalElement = document.getElementById('totalCustomers');
+  
+  if (todayElement) todayElement.textContent = appData.systemStats.todayInteractions;
+  if (totalElement) totalElement.textContent = appData.systemStats.totalCustomers;
 }
 
 // Customers View
@@ -522,9 +628,10 @@ function loadCustomers() {
 
 function renderCustomers() {
   const container = document.getElementById('customersGrid');
+  if (!container) return;
   
   container.innerHTML = filteredCustomers.map(customer => `
-    <div class="customer-card" data-customer-key="${customer.customerKey}" style="cursor: pointer;">
+    <div class="customer-card" data-customer-key="${customer.customerKey}" style="cursor: pointer; tabindex: 0;">
       <div class="customer-header">
         <div>
           <div class="customer-name">${customer.contactName}</div>
@@ -535,7 +642,7 @@ function renderCustomers() {
         <div>📧 ${customer.email}</div>
         <div>📍 ${customer.location}</div>
         <div>🏭 ${customer.industry}</div>
-        <div>📞 ${maskPhoneNumber(customer.phoneNumber)}</div>
+        <div>📞 ${customer.phoneNumber}</div>
       </div>
       <div class="customer-meta">
         <span class="interaction-count">${customer.totalInteractions} interactions</span>
@@ -543,13 +650,25 @@ function renderCustomers() {
       </div>
     </div>
   `).join('');
-
-  // Add click listeners for customer cards
+  
+  // Add click event listeners to customer cards
   container.querySelectorAll('.customer-card').forEach(card => {
-    card.addEventListener('click', (e) => {
-      e.preventDefault();
+    card.addEventListener('click', () => {
       const customerKey = card.dataset.customerKey;
-      openCustomerModal(customerKey);
+      if (customerKey) {
+        openLeadView(customerKey);
+      }
+    });
+    
+    // Add keyboard support
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const customerKey = card.dataset.customerKey;
+        if (customerKey) {
+          openLeadView(customerKey);
+        }
+      }
     });
   });
 }
@@ -558,12 +677,8 @@ function initCustomerFilters() {
   const searchInput = document.getElementById('customerSearch');
   const industryFilter = document.getElementById('industryFilter');
 
-  if (searchInput) {
-    searchInput.addEventListener('input', filterCustomers);
-  }
-  if (industryFilter) {
-    industryFilter.addEventListener('change', filterCustomers);
-  }
+  if (searchInput) searchInput.addEventListener('input', filterCustomers);
+  if (industryFilter) industryFilter.addEventListener('change', filterCustomers);
 }
 
 function filterCustomers() {
@@ -571,7 +686,7 @@ function filterCustomers() {
   const industryFilter = document.getElementById('industryFilter');
   
   const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-  const industry = industryFilter ? industryFilter.value : '';
+  const industryValue = industryFilter ? industryFilter.value : '';
 
   filteredCustomers = appData.customers.filter(customer => {
     const matchesSearch = !searchTerm || 
@@ -580,7 +695,7 @@ function filterCustomers() {
       customer.phoneNumber.includes(searchTerm) ||
       customer.email.toLowerCase().includes(searchTerm);
     
-    const matchesIndustry = !industry || customer.industry === industry;
+    const matchesIndustry = !industryValue || customer.industry === industryValue;
     
     return matchesSearch && matchesIndustry;
   });
@@ -596,6 +711,7 @@ function loadCommunications() {
 
 function renderCommunications() {
   const container = document.getElementById('communicationTimeline');
+  if (!container) return;
   
   const sortedInteractions = filteredInteractions
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
@@ -620,9 +736,6 @@ function renderCommunications() {
       }
       if (interaction.metadata.campaignName) {
         metadata += `<div class="metadata-item">🎯 ${interaction.metadata.campaignName}</div>`;
-      }
-      if (interaction.metadata.phoneNumber) {
-        metadata += `<div class="metadata-item">📞 ${maskPhoneNumber(interaction.metadata.phoneNumber)}</div>`;
       }
     }
     
@@ -649,15 +762,9 @@ function initCommunicationFilters() {
   const directionFilter = document.getElementById('directionFilter');
   const dateFilter = document.getElementById('dateFilter');
 
-  if (channelFilter) {
-    channelFilter.addEventListener('change', filterCommunications);
-  }
-  if (directionFilter) {
-    directionFilter.addEventListener('change', filterCommunications);
-  }
-  if (dateFilter) {
-    dateFilter.addEventListener('change', filterCommunications);
-  }
+  if (channelFilter) channelFilter.addEventListener('change', filterCommunications);
+  if (directionFilter) directionFilter.addEventListener('change', filterCommunications);
+  if (dateFilter) dateFilter.addEventListener('change', filterCommunications);
 }
 
 function filterCommunications() {
@@ -665,18 +772,18 @@ function filterCommunications() {
   const directionFilter = document.getElementById('directionFilter');
   const dateFilter = document.getElementById('dateFilter');
   
-  const channel = channelFilter ? channelFilter.value : '';
-  const direction = directionFilter ? directionFilter.value : '';
-  const date = dateFilter ? dateFilter.value : '';
+  const channelValue = channelFilter ? channelFilter.value : '';
+  const directionValue = directionFilter ? directionFilter.value : '';
+  const dateValue = dateFilter ? dateFilter.value : '';
 
   filteredInteractions = appData.interactions.filter(interaction => {
-    const matchesChannel = !channel || interaction.channel === channel;
-    const matchesDirection = !direction || interaction.direction === direction;
+    const matchesChannel = !channelValue || interaction.channel === channelValue;
+    const matchesDirection = !directionValue || interaction.direction === directionValue;
     
     let matchesDate = true;
-    if (date) {
+    if (dateValue) {
       const interactionDate = new Date(interaction.timestamp).toISOString().split('T')[0];
-      matchesDate = interactionDate === date;
+      matchesDate = interactionDate === dateValue;
     }
     
     return matchesChannel && matchesDirection && matchesDate;
@@ -688,10 +795,11 @@ function filterCommunications() {
 // Campaigns View
 function loadCampaigns() {
   const container = document.getElementById('campaignsGrid');
+  if (!container) return;
   
   container.innerHTML = appData.campaigns.map(campaign => {
-    const connectRate = campaign.contacted > 0 ? ((campaign.connected / campaign.contacted) * 100).toFixed(1) : '0';
-    const interestRate = campaign.connected > 0 ? ((campaign.interested / campaign.connected) * 100).toFixed(1) : '0';
+    const connectRate = ((campaign.connected / campaign.contacted) * 100).toFixed(1);
+    const interestRate = ((campaign.interested / campaign.connected) * 100).toFixed(1);
     
     return `
       <div class="campaign-card">
@@ -730,50 +838,100 @@ function loadCampaigns() {
   }).join('');
 }
 
-// Customer Modal
-function openCustomerModal(customerKey) {
-  console.log('Opening modal for customer:', customerKey);
-  const modal = document.getElementById('customerModal');
+// Lead View
+function openLeadView(customerKey) {
   const customer = findCustomerByKey(customerKey);
+  if (!customer) return;
+
+  currentLeadKey = customerKey;
+  timelineDisplayCount = 10;
+
+  // Update lead header
+  const leadCompanyName = document.getElementById('leadCompanyName');
+  const leadContactName = document.getElementById('leadContactName');
+  const leadPhoneMasked = document.getElementById('leadPhoneMasked');
+  const leadIndustry = document.getElementById('leadIndustry');
   
-  if (!customer) {
-    console.error('Customer not found:', customerKey);
-    return;
+  if (leadCompanyName) leadCompanyName.textContent = customer.companyName;
+  if (leadContactName) leadContactName.textContent = customer.contactName;
+  if (leadPhoneMasked) leadPhoneMasked.textContent = maskPhoneNumber(customer.phoneNumber);
+  if (leadIndustry) leadIndustry.textContent = customer.industry;
+
+  // Update stats
+  const customerInteractions = appData.interactions.filter(i => i.customerKey === customerKey);
+  const totalInteractionsCount = document.getElementById('totalInteractionsCount');
+  const lastInteractionTime = document.getElementById('lastInteractionTime');
+  
+  if (totalInteractionsCount) totalInteractionsCount.textContent = customerInteractions.length;
+  if (lastInteractionTime) lastInteractionTime.textContent = formatDateTime(customer.lastInteraction);
+
+  // Update channel mix bar
+  updateChannelMixBar(customerInteractions);
+
+  // Load timeline and call summary
+  loadLeadTimeline();
+  loadCallSummary();
+
+  // Show modal
+  const modal = document.getElementById('leadViewModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+  }
+}
+
+function updateChannelMixBar(interactions) {
+  const channelCounts = {};
+  const totalInteractions = interactions.length;
+
+  interactions.forEach(interaction => {
+    const channel = interaction.channel;
+    channelCounts[channel] = (channelCounts[channel] || 0) + 1;
+  });
+
+  const channelMixBar = document.getElementById('channelMixBar');
+  if (!channelMixBar) return;
+  
+  let html = '';
+
+  if (channelCounts['WhatsApp']) {
+    const percentage = (channelCounts['WhatsApp'] / totalInteractions) * 100;
+    html += `<div class="channel-segment whatsapp" style="width: ${percentage}%" title="WhatsApp: ${channelCounts['WhatsApp']}"></div>`;
   }
 
-  // Update modal content
-  document.getElementById('modalCustomerName').textContent = customer.companyName;
-  
-  const customerInfo = document.getElementById('customerInfo');
-  customerInfo.innerHTML = `
-    <div class="customer-details">
-      <div><strong>Contact:</strong> ${customer.contactName}</div>
-      <div><strong>Phone:</strong> ${maskPhoneNumber(customer.phoneNumber)}</div>
-      <div><strong>Email:</strong> ${customer.email}</div>
-      <div><strong>Industry:</strong> ${customer.industry}</div>
-      <div><strong>Location:</strong> ${customer.location}</div>
-      <div><strong>CRM ID:</strong> ${customer.crmContactId}</div>
-      <div><strong>Total Interactions:</strong> ${customer.totalInteractions}</div>
-      <div><strong>Last Interaction:</strong> ${formatDateTime(customer.lastInteraction)}</div>
-    </div>
-  `;
+  if (channelCounts['Business Call'] || channelCounts['Mobile Call']) {
+    const callCount = (channelCounts['Business Call'] || 0) + (channelCounts['Mobile Call'] || 0);
+    const percentage = (callCount / totalInteractions) * 100;
+    html += `<div class="channel-segment calls" style="width: ${percentage}%" title="Calls: ${callCount}"></div>`;
+  }
 
-  // Load customer timeline
+  if (channelCounts['Dialer']) {
+    const percentage = (channelCounts['Dialer'] / totalInteractions) * 100;
+    html += `<div class="channel-segment dialer" style="width: ${percentage}%" title="Dialer: ${channelCounts['Dialer']}"></div>`;
+  }
+
+  channelMixBar.innerHTML = html;
+}
+
+function loadLeadTimeline() {
+  if (!currentLeadKey) return;
+  
   const customerInteractions = appData.interactions
-    .filter(interaction => interaction.customerKey === customerKey)
+    .filter(i => i.customerKey === currentLeadKey)
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-  const timeline = document.getElementById('customerTimeline');
-  timeline.innerHTML = customerInteractions.map(interaction => {
+  const displayedInteractions = customerInteractions.slice(0, timelineDisplayCount);
+  const timelineContainer = document.getElementById('leadTimeline');
+  
+  if (!timelineContainer) return;
+
+  timelineContainer.innerHTML = displayedInteractions.map(interaction => {
     const channelClass = getChannelClass(interaction.channel);
     const channelIcon = getChannelIcon(interaction.channel);
-    
+
     let metadata = '';
     if (interaction.metadata) {
       if (interaction.metadata.duration) {
-        const minutes = Math.floor(interaction.metadata.duration / 60);
-        const seconds = interaction.metadata.duration % 60;
-        metadata += `<div class="metadata-item">⏱️ ${minutes}:${seconds.toString().padStart(2, '0')}</div>`;
+        metadata += `<div class="metadata-item">⏱️ ${formatDuration(interaction.metadata.duration)}</div>`;
       }
       if (interaction.metadata.deliveryStatus) {
         metadata += `<div class="metadata-item">📊 ${interaction.metadata.deliveryStatus}</div>`;
@@ -782,9 +940,9 @@ function openCustomerModal(customerKey) {
         metadata += `<div class="metadata-item">📋 ${interaction.metadata.disposition}</div>`;
       }
     }
-    
+
     return `
-      <div class="timeline-item">
+      <div class="lead-timeline-item">
         <div class="timeline-indicator ${channelClass}"></div>
         <div class="timeline-content">
           <div class="timeline-header">
@@ -799,39 +957,227 @@ function openCustomerModal(customerKey) {
     `;
   }).join('');
 
-  modal.classList.remove('hidden');
+  // Show/hide load more button
+  const loadMoreBtn = document.getElementById('loadMoreTimeline');
+  if (loadMoreBtn) {
+    if (customerInteractions.length > timelineDisplayCount) {
+      loadMoreBtn.style.display = 'block';
+    } else {
+      loadMoreBtn.style.display = 'none';
+    }
+  }
 }
 
-function closeCustomerModal() {
-  document.getElementById('customerModal').classList.add('hidden');
+function loadMoreTimeline() {
+  timelineDisplayCount += 10;
+  loadLeadTimeline();
+}
+
+function loadCallSummary() {
+  if (!currentLeadKey) return;
+
+  const timeFilterElement = document.getElementById('callTimeFilter');
+  const timeFilter = timeFilterElement ? timeFilterElement.value : 'all';
+  let filteredCalls = getCallsForCustomer(currentLeadKey, timeFilter);
+
+  // Update metrics
+  const totalCalls = filteredCalls.length;
+  const totalDuration = filteredCalls.reduce((sum, call) => sum + call.duration, 0);
+  const avgDuration = totalCalls > 0 ? Math.round(totalDuration / totalCalls) : 0;
+  const connectedCalls = filteredCalls.filter(call => call.call_outcome !== 'no_answer' && call.call_outcome !== 'busy').length;
+  const connectRate = totalCalls > 0 ? Math.round((connectedCalls / totalCalls) * 100) : 0;
+
+  const totalCallsElement = document.getElementById('totalCalls');
+  const avgDurationElement = document.getElementById('avgDuration');
+  const connectRateElement = document.getElementById('connectRate');
+  
+  if (totalCallsElement) totalCallsElement.textContent = totalCalls;
+  if (avgDurationElement) avgDurationElement.textContent = formatDuration(avgDuration);
+  if (connectRateElement) connectRateElement.textContent = `${connectRate}%`;
+
+  // Update call table
+  const callTableBody = document.getElementById('callTableBody');
+  if (!callTableBody) return;
+  
+  callTableBody.innerHTML = filteredCalls.map(call => {
+    const outcomeClass = call.call_outcome.replace(/_/g, '_').toLowerCase();
+    const recordingIcon = call.recording_url ? 
+      `<span class="recording-link" onclick="playRecording('${call.recording_url}')" title="Play Recording">🎵</span>` : 
+      '-';
+
+    return `
+      <tr>
+        <td>${formatTime(call.call_start_time)}</td>
+        <td>${formatDuration(call.duration)}</td>
+        <td><span class="call-outcome ${outcomeClass}">${call.call_outcome.replace(/_/g, ' ')}</span></td>
+        <td>${recordingIcon}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function getCallsForCustomer(customerKey, timeFilter = 'all') {
+  const customerInteractions = appData.interactions
+    .filter(i => i.customerKey === customerKey && (i.channel === 'Business Call' || i.channel === 'Mobile Call'));
+
+  const interactionIds = customerInteractions.map(i => i.id);
+  let calls = appData.call_logs.filter(call => interactionIds.includes(call.interaction_id));
+
+  // Apply time filter
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  switch (timeFilter) {
+    case 'today':
+      calls = calls.filter(call => new Date(call.call_start_time) >= today);
+      break;
+    case '7days':
+      const week = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+      calls = calls.filter(call => new Date(call.call_start_time) >= week);
+      break;
+    case '30days':
+      const month = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+      calls = calls.filter(call => new Date(call.call_start_time) >= month);
+      break;
+  }
+
+  return calls.sort((a, b) => new Date(b.call_start_time) - new Date(a.call_start_time));
+}
+
+function playRecording(url) {
+  // Simulate playing recording
+  alert(`Playing recording: ${url}`);
+}
+
+function closeLead() {
+  const modal = document.getElementById('leadViewModal');
+  if (modal) {
+    modal.classList.add('hidden');
+  }
+  currentLeadKey = null;
+}
+
+// Quick Actions
+function openCallbackModal() {
+  const modal = document.getElementById('callbackModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+  }
+  
+  // Set minimum datetime to current time
+  const now = new Date();
+  now.setMinutes(now.getMinutes() + 15); // Add 15 minutes buffer
+  const callbackDateTime = document.getElementById('callbackDateTime');
+  if (callbackDateTime) {
+    callbackDateTime.min = now.toISOString().slice(0, 16);
+  }
+}
+
+function closeCallbackModal() {
+  const modal = document.getElementById('callbackModal');
+  const form = document.getElementById('callbackForm');
+  
+  if (modal) modal.classList.add('hidden');
+  if (form) form.reset();
+}
+
+function scheduleCallback(event) {
+  event.preventDefault();
+  
+  const datetimeElement = document.getElementById('callbackDateTime');
+  const notesElement = document.getElementById('callbackNotes');
+  
+  const datetime = datetimeElement ? datetimeElement.value : '';
+  const notes = notesElement ? notesElement.value : '';
+  
+  if (!datetime) {
+    alert('Please select a callback date and time.');
+    return;
+  }
+  
+  // Simulate scheduling callback
+  alert(`Callback scheduled for ${new Date(datetime).toLocaleString('en-IN')}${notes ? '\nNotes: ' + notes : ''}`);
+  
+  closeCallbackModal();
+}
+
+function openWhatsAppModal() {
+  const modal = document.getElementById('whatsappModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+  }
+}
+
+function closeWhatsAppModal() {
+  const modal = document.getElementById('whatsappModal');
+  const form = document.getElementById('whatsappForm');
+  
+  if (modal) modal.classList.add('hidden');
+  if (form) form.reset();
+}
+
+function updateMessageTemplate() {
+  const templateElement = document.getElementById('messageTemplate');
+  const messageContentElement = document.getElementById('messageContent');
+  
+  if (!templateElement || !messageContentElement) return;
+  
+  const template = templateElement.value;
+  
+  const templates = {
+    'followup': 'Hi! Following up on our previous discussion. Do you have any questions or need additional information?',
+    'quote': 'Thank you for your interest! Could you please share your specific requirements so we can prepare a detailed quotation for you?',
+    'catalog': 'Please find our latest product catalog attached. Let me know if you need more information about any specific products.',
+    'custom': ''
+  };
+  
+  messageContentElement.value = templates[template] || '';
+}
+
+function sendWhatsAppMessage(event) {
+  event.preventDefault();
+  
+  const templateElement = document.getElementById('messageTemplate');
+  const contentElement = document.getElementById('messageContent');
+  
+  const template = templateElement ? templateElement.value : '';
+  const content = contentElement ? contentElement.value : '';
+  
+  if (!template || !content.trim()) {
+    alert('Please select a template and enter a message.');
+    return;
+  }
+  
+  // Simulate sending message
+  alert(`WhatsApp message sent:\n"${content}"`);
+  
+  closeWhatsAppModal();
 }
 
 // Refresh Data
 function refreshData() {
   const refreshBtn = document.getElementById('refreshData');
-  if (refreshBtn) {
-    refreshBtn.textContent = '⟳ Refreshing...';
-    refreshBtn.disabled = true;
+  if (!refreshBtn) return;
+  
+  refreshBtn.textContent = '⟳ Refreshing...';
+  refreshBtn.disabled = true;
 
-    // Simulate data refresh
-    setTimeout(() => {
-      loadDashboard();
-      refreshBtn.textContent = '🔄 Refresh';
-      refreshBtn.disabled = false;
-      
-      // Update last sync time
-      const lastSync = document.querySelector('.last-sync');
-      if (lastSync) {
-        lastSync.textContent = 'Last sync: Just now';
-      }
-    }, 1500);
-  }
+  // Simulate data refresh
+  setTimeout(() => {
+    loadDashboard();
+    refreshBtn.textContent = '🔄 Refresh';
+    refreshBtn.disabled = false;
+    
+    // Update last sync time
+    const lastSync = document.querySelector('.last-sync');
+    if (lastSync) {
+      lastSync.textContent = 'Last sync: Just now';
+    }
+  }, 1500);
 }
 
 // Initialize Application
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('Industri-Connect initializing...');
-  
   // Initialize navigation
   initNavigation();
   
@@ -844,20 +1190,107 @@ document.addEventListener('DOMContentLoaded', function() {
     refreshBtn.addEventListener('click', refreshData);
   }
   
-  const closeModalBtn = document.getElementById('closeModal');
-  if (closeModalBtn) {
-    closeModalBtn.addEventListener('click', closeCustomerModal);
+  // Lead View Modal
+  const closeLead = document.getElementById('closeLead');
+  if (closeLead) {
+    closeLead.addEventListener('click', () => {
+      const modal = document.getElementById('leadViewModal');
+      if (modal) {
+        modal.classList.add('hidden');
+      }
+      currentLeadKey = null;
+    });
   }
   
-  // Close modal when clicking outside
-  const modal = document.getElementById('customerModal');
-  if (modal) {
-    modal.addEventListener('click', function(e) {
+  const loadMoreTimeline = document.getElementById('loadMoreTimeline');
+  if (loadMoreTimeline) {
+    loadMoreTimeline.addEventListener('click', () => {
+      timelineDisplayCount += 10;
+      loadLeadTimeline();
+    });
+  }
+  
+  const callTimeFilter = document.getElementById('callTimeFilter');
+  if (callTimeFilter) {
+    callTimeFilter.addEventListener('change', loadCallSummary);
+  }
+  
+  // Quick Actions
+  const scheduleCallbackBtn = document.getElementById('scheduleCallback');
+  if (scheduleCallbackBtn) {
+    scheduleCallbackBtn.addEventListener('click', openCallbackModal);
+  }
+  
+  const sendWhatsAppBtn = document.getElementById('sendWhatsApp');
+  if (sendWhatsAppBtn) {
+    sendWhatsAppBtn.addEventListener('click', openWhatsAppModal);
+  }
+  
+  // Callback Modal
+  const closeCallback = document.getElementById('closeCallback');
+  if (closeCallback) {
+    closeCallback.addEventListener('click', closeCallbackModal);
+  }
+  
+  const cancelCallback = document.getElementById('cancelCallback');
+  if (cancelCallback) {
+    cancelCallback.addEventListener('click', closeCallbackModal);
+  }
+  
+  const callbackForm = document.getElementById('callbackForm');
+  if (callbackForm) {
+    callbackForm.addEventListener('submit', scheduleCallback);
+  }
+  
+  // WhatsApp Modal
+  const closeWhatsApp = document.getElementById('closeWhatsApp');
+  if (closeWhatsApp) {
+    closeWhatsApp.addEventListener('click', closeWhatsAppModal);
+  }
+  
+  const cancelWhatsApp = document.getElementById('cancelWhatsApp');
+  if (cancelWhatsApp) {
+    cancelWhatsApp.addEventListener('click', closeWhatsAppModal);
+  }
+  
+  const whatsappForm = document.getElementById('whatsappForm');
+  if (whatsappForm) {
+    whatsappForm.addEventListener('submit', sendWhatsAppMessage);
+  }
+  
+  const messageTemplate = document.getElementById('messageTemplate');
+  if (messageTemplate) {
+    messageTemplate.addEventListener('change', updateMessageTemplate);
+  }
+  
+  // Close modals when clicking outside
+  const leadViewModal = document.getElementById('leadViewModal');
+  if (leadViewModal) {
+    leadViewModal.addEventListener('click', function(e) {
       if (e.target === this) {
-        closeCustomerModal();
+        this.classList.add('hidden');
+        currentLeadKey = null;
+      }
+    });
+  }
+  
+  const callbackModal = document.getElementById('callbackModal');
+  if (callbackModal) {
+    callbackModal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeCallbackModal();
+      }
+    });
+  }
+  
+  const whatsappModal = document.getElementById('whatsappModal');
+  if (whatsappModal) {
+    whatsappModal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeWhatsAppModal();
       }
     });
   }
 
-  console.log('Industri-Connect Communication Consolidation System initialized successfully');
+  console.log('IndustriConnect CRM initialized successfully');
 });
